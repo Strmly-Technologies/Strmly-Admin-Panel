@@ -42,7 +42,7 @@ const page = () => {
         setError('');
         setLoading(true);
         try {
-            const res = await fetch('http://localhost:3001/api/v1/admin/creator-passes', {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_STRMLY_BACKEND_URL}/creator-passes`, {
                 method: 'GET',
                 headers: authHeaders()
             });
@@ -93,6 +93,7 @@ const page = () => {
                     <button onClick={()=>router.push('/users')} className="hover:underline">Users</button>
                     <button onClick={()=>router.push('/payments')} className="hover:underline underline">Payments</button>
                     <button onClick={()=>router.push('/transactions')} className="hover:underline">Transactions</button>
+                    <button onClick={()=>router.push('/withdrawals')} className="hover:underline">Withdrawals</button>
                     <button onClick={handleLogout} className="bg-white text-black px-3 py-1 rounded hover:bg-gray-200">Logout</button>
                 </div>
             </nav>
