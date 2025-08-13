@@ -87,6 +87,7 @@ const page = () => {
           <button onClick={()=>router.push('/users')} className="hover:underline">Users</button>
           <button onClick={()=>router.push('/payments')} className="hover:underline">Payments</button>
           <button onClick={()=>router.push('/transactions')} className="hover:underline underline">Transactions</button>
+          <button onClick={()=>router.push('/withdrawals')} className="hover:underline">Withdrawals</button>
           <button onClick={handleLogout} className="bg-white text-black px-3 py-1 rounded hover:bg-gray-200">Logout</button>
         </div>
       </nav>
@@ -168,7 +169,7 @@ const page = () => {
                   <tr
                     key={tx._id}
                     className="border-b border-gray-200 hover:bg-gray-50 cursor-pointer transition"
-                    onClick={() => router.push(`/transactions/${tx._id}`)}
+                    onClick={() => tx.transaction_category!=='withdrawal_request' && router.push(`/transactions/${tx._id}`)}
                     title={tx._id}
                   >
                     <td className="px-4 py-2 font-mono">{shortId}</td>

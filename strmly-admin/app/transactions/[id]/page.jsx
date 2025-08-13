@@ -19,7 +19,7 @@ const TransactionDetail = () => {
     const fetchTransaction = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_STRMLY_BACKEND_URL}/${id}`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_STRMLY_BACKEND_URL}/transaction/${id}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -56,6 +56,7 @@ const TransactionDetail = () => {
           <button onClick={()=>router.push('/users')} className="hover:underline">Users</button>
           <button onClick={()=>router.push('/payments')} className="hover:underline">Payments</button>
           <button onClick={()=>router.push('/transactions')} className="hover:underline">Transactions</button>
+          <button onClick={()=>router.push('/withdrawals')} className="hover:underline">Withdrawals</button>
           <button onClick={handleLogout} className="bg-white text-black px-3 py-1 rounded hover:bg-gray-200">Logout</button>
         </div>
       </nav>
