@@ -21,7 +21,7 @@ const DashboardPage = () => {
       setOvLoading(true);
       setOvError('');
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_STRMLY_BACKEND_URL}/overview`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_STRMLY_BACKEND_URL}/financial-overview`, {
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -79,37 +79,106 @@ const DashboardPage = () => {
           )}
           {overview && (
             <div className="flex flex-col gap-10">
+              {/* Platform Summary */}
+              <section>
+                <h3 className="text-sm uppercase tracking-wider font-semibold mb-3">Platform Summary</h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <Card title="Total Revenue" amount={overview.platformMetrics.totalRevenue} emphasis />
+                  <Card title="Withdrawals" amount={overview.withdrawals.completedWithdrawals.amount} emphasis />
+                  <Card title="Net Balance" amount={overview.platformMetrics.netPlatformBalance} emphasis />
+                  <Card title="Withdrawal Rate" amount={`${overview.platformMetrics.withdrawalRate}%`} emphasis isPercentage />
+                </div>
+              </section>
+
               {/* Gifting */}
               <section>
                 <h3 className="text-sm uppercase tracking-wider font-semibold mb-3">Gifting</h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <Card title="Creator Gifting" amount={overview.gifting.creatorGifting.amount} count={overview.gifting.creatorGifting.count} />
-                  <Card title="Comment Gifting" amount={overview.gifting.commentGifting.amount} count={overview.gifting.commentGifting.count} />
-                  <Card title="Total Gifting" amount={overview.gifting.totalGifting} emphasis />
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  <Card 
+                    title="Video Gifting" 
+                    amount={overview.gifting.videoGifting.amount} 
+                    count={overview.gifting.videoGifting.count} 
+                  />
+                  <Card 
+                    title="Comment Gifting" 
+                    amount={overview.gifting.commentGifting.amount} 
+                    count={overview.gifting.commentGifting.count} 
+                  />
+                  <Card 
+                    title="Total Gifting" 
+                    amount={overview.gifting.totalGifting} 
+                    emphasis 
+                  />
                 </div>
               </section>
 
               {/* Monetization */}
               <section>
                 <h3 className="text-sm uppercase tracking-wider font-semibold mb-3">Monetization</h3>
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                  <Card title="Content Sales" amount={overview.monetization.contentSales.amount} count={overview.monetization.contentSales.count} />
-                  <Card title="Creator Passes" amount={overview.monetization.creatorPasses.amount} count={overview.monetization.creatorPasses.count} />
-                  <Card title="Community Fees" amount={overview.monetization.communityFees.amount} count={overview.monetization.communityFees.count} />
-                  <Card title="Total Monetization" amount={overview.monetization.totalMonetization} emphasis className="md:col-span-2" />
-                </div>
-              </section>
-
-              {/* Withdrawals */}
-              <section>
-                <h3 className="text-sm uppercase tracking-wider font-semibold mb-3">Withdrawals</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <Card title="Pending Requests" amount={overview.withdrawals.pendingRequests.amount} count={overview.withdrawals.pendingRequests.count} />
-                  <Card title="Completed" amount={overview.withdrawals.completedWithdrawals.amount} count={overview.withdrawals.completedWithdrawals.count} />
+                  <Card 
+                    title="Content Sales" 
+                    amount={overview.monetization.contentSales.amount} 
+                    count={overview.monetization.contentSales.count} 
+                  />
+                  <Card 
+                    title="Creator Passes" 
+                    amount={overview.monetization.creatorPasses.amount} 
+                    count={overview.monetization.creatorPasses.count} 
+                  />
+                  <Card 
+                    title="Community Fees" 
+                    amount={overview.monetization.communityFees.amount} 
+                    count={overview.monetization.communityFees.count} 
+                  />
+                  <Card 
+                    title="Total Monetization" 
+                    amount={overview.monetization.totalMonetization} 
+                    emphasis 
+                  />
                 </div>
               </section>
 
-             
+              {/* Withdrawals & Wallet Activity */}
+              <section>
+                <h3 className="text-sm uppercase tracking-wider font-semibold mb-3">Withdrawals & Wallet Activity</h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  <Card 
+                    title="Pending Withdrawals" 
+                    amount={overview.withdrawals.pendingRequests.amount} 
+                    count={overview.withdrawals.pendingRequests.count} 
+                  />
+                  <Card 
+                    title="Completed Withdrawals" 
+                    amount={overview.withdrawals.completedWithdrawals.amount} 
+                    count={overview.withdrawals.completedWithdrawals.count} 
+                  />
+                  <Card 
+                    title="Wallet Loads" 
+                    amount={overview.walletActivity.totalLoaded.amount} 
+                    count={overview.walletActivity.totalLoaded.count} 
+                  />
+                </div>
+              </section>
+
+              {/* Average Transaction Values */}
+              <section>
+                <h3 className="text-sm uppercase tracking-wider font-semibold mb-3">Average Transaction Values</h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  <MetricCard 
+                    label="Avg Gifting" 
+                    value={`₹${overview.platformMetrics.avgTransactionValue.gifting}`} 
+                  />
+                  <MetricCard 
+                    label="Avg Content Sales" 
+                    value={`₹${overview.platformMetrics.avgTransactionValue.contentSales}`} 
+                  />
+                  <MetricCard 
+                    label="Avg Creator Passes" 
+                    value={`₹${overview.platformMetrics.avgTransactionValue.creatorPasses}`} 
+                  />
+                </div>
+              </section>
             </div>
           )}
         </div>
@@ -119,10 +188,12 @@ const DashboardPage = () => {
 };
 
 // Reusable card components
-const Card = ({ title, amount, count, emphasis, className = '' }) => (
+const Card = ({ title, amount, count, emphasis, className = '', isPercentage = false }) => (
   <div className={`border border-black rounded-lg p-4 flex flex-col gap-2 bg-white shadow-sm ${className}`}>
     <span className={`text-xs uppercase tracking-wide ${emphasis ? 'font-bold' : 'font-medium'}`}>{title}</span>
-    <span className={`text-2xl font-mono ${emphasis ? 'font-bold' : 'font-semibold'}`}>{amount}</span>
+    <span className={`text-2xl font-mono ${emphasis ? 'font-bold' : 'font-semibold'}`}>
+      {isPercentage ? amount : `₹${amount}`}
+    </span>
     {typeof count !== 'undefined' && (
       <span className="text-xs text-gray-600">{count} {count === 1 ? 'tx' : 'txs'}</span>
     )}

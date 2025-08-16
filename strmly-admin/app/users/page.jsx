@@ -185,7 +185,12 @@ export const page = () => {
                             </thead>
                             <tbody>
                                 {users.map(user => (
-                                    <tr key={user._id} className="border-b border-gray-200 hover:bg-gray-50">
+                                    <tr
+                                      key={user._id}
+                                      className="border-b border-gray-200 hover:bg-gray-50 cursor-pointer"
+                                      onClick={() => router.push(`/users/${user._id}/transactions`)}
+                                      title="View transactions"
+                                    >
                                         <td className="px-4 py-2 font-semibold">{user.username}</td>
                                         <td className="px-4 py-2">{user.email}</td>
                                         <td className="px-4 py-2">{new Date(user.createdAt).toLocaleDateString()}</td>
