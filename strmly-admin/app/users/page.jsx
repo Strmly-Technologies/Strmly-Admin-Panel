@@ -94,6 +94,7 @@ export const page = () => {
                     <button onClick={()=>router.push('/withdrawals')} className="hover:underline">Withdrawals</button>
                     <button onClick={()=>router.push('/video_copy')} className="hover:underline">Copyright Violations</button>
                     <button onClick={()=>router.push('/nsfw')} className="hover:underline">NSFW Content</button>
+
                     <button onClick={handleLogout} className="bg-white text-black px-3 py-1 rounded hover:bg-gray-200">Logout</button>
                 </div>
             </nav>
