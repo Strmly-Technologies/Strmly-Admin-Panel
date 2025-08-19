@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 const Login = () => {
@@ -11,6 +11,18 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [countdown, setCountdown] = useState(0);
   const router = useRouter();
+
+  // Check for existing token and redirect to dashboard if found
+  useEffect(() => {
+    try {
+      const token = localStorage.getItem('token');
+      if (token) {
+        router.push('/dashboard');
+      }
+    } catch (err) {
+      console.error("Error checking authentication:", err);
+    }
+  }, [router]);
 
   const handleCredentialsSubmit = async (e) => {
     e.preventDefault();
