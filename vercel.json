@@ -1,7 +1,0 @@
-{
-  "framework": "nextjs",
-  "installCommand": "cd strmly-admin && npm install",
-  "buildCommand": "cd strmly-admin && npm run build",
-  "outputDirectory": "strmly-admin/.next",
-  "rootDirectory": "strmly-admin"
-}
