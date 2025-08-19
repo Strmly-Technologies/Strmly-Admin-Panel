@@ -147,7 +147,7 @@ const Login = () => {
             onSubmit={handleCredentialsSubmit}
             className="bg-black mt-44 text-white p-8 rounded-lg shadow-lg min-w-[320px] flex flex-col gap-4"
           >
-            <h2 className="text-center mb-4 tracking-widest text-2xl font-bold">STRMLY Admin Login</h2>
+            <h2 className="text-center mb-4 tracking-wider text-2xl font-bold">STRMLY Admin Login</h2>
             <input
               type="text"
               placeholder="Username"
@@ -183,7 +183,7 @@ const Login = () => {
             onSubmit={handleOtpSubmit}
             className="bg-black mt-44 text-white p-8 rounded-lg shadow-lg min-w-[320px] flex flex-col gap-4"
           >
-            <h2 className="text-center mb-4 tracking-widest text-2xl font-bold">Enter OTP</h2>
+            <h2 className="text-center mb-4 tracking-wider text-2xl font-bold">Enter OTP</h2>
             <p className="text-sm text-gray-400 text-center mb-4">
               We've sent a one-time password to <strong>rohithbn27@gmail.com</strong>
             </p>
