@@ -1,3 +1,5 @@
+
+
 'use client'
 import { useEffect, useState } from "react";
 import { useRouter } from 'next/navigation';
@@ -78,7 +80,6 @@ export default function VideoCopyrightViolations() {
     
     setActionLoading(prev => ({ ...prev, [violationId]: 'deleting' }));
     try {
-      // Updated DELETE endpoint format with type as query parameter
       const res = await fetch(`${process.env.NEXT_PUBLIC_STRMLY_BACKEND_URL}/video/${videoId}?type=copy`, {
         method: 'DELETE',
         headers: {
@@ -91,16 +92,8 @@ export default function VideoCopyrightViolations() {
       
       if (res.ok) {
         console.log(`Successfully deleted video ${videoId}`);
-        // Remove the violation from the list
-        setViolations(prev => prev.filter(v => v.id !== violationId));
-        
-        // Update statistics if they exist
-        if (stats && stats.totalViolations) {
-          setStats({
-            ...stats,
-            totalViolations: Math.max(0, stats.totalViolations - 1)
-          });
-        }
+        // Fetch updated violations instead of manipulating the state
+        fetchViolations();
       } else {
         console.error('Error deleting video:', data.message);
         setActionLoading(prev => ({ ...prev, [violationId]: 'error' }));
@@ -133,7 +126,6 @@ export default function VideoCopyrightViolations() {
     
     setActionLoading(prev => ({ ...prev, [violationId]: 'ignoring' }));
     try {
-      // Updated ignore endpoint format
       const res = await fetch(`${process.env.NEXT_PUBLIC_STRMLY_BACKEND_URL}/video/${videoId}/ignore/copy`, {
         method: 'POST',
         headers: {
@@ -146,16 +138,8 @@ export default function VideoCopyrightViolations() {
       
       if (res.ok) {
         console.log(`Successfully ignored violation for video ${videoId}`);
-        // Remove the violation from the list
-        setViolations(prev => prev.filter(v => v.id !== violationId));
-        
-        // Update statistics if they exist
-        if (stats && stats.totalViolations) {
-          setStats({
-            ...stats,
-            totalViolations: Math.max(0, stats.totalViolations - 1)
-          });
-        }
+        // Fetch updated violations instead of manipulating the state
+        fetchViolations();
       } else {
         console.error('Error ignoring violation:', data.message);
         setActionLoading(prev => ({ ...prev, [violationId]: 'error' }));
@@ -359,6 +343,13 @@ export default function VideoCopyrightViolations() {
                       </svg>
                       Action failed. Please try again.
                     </div>
+                  ) : violation.actionTaken && violation.actionTaken !== "none" ? (
+                    <div className="text-green-600 text-sm flex items-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                      Action taken: <span className="font-semibold ml-1 capitalize">{violation.actionTaken}</span>
+                    </div>
                   ) : (
                     <>
                       <ActionButton 
@@ -421,3 +412,4 @@ export default function VideoCopyrightViolations() {
     </div>
   );
 }
+            
