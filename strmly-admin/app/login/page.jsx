@@ -10,6 +10,7 @@ const Login = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [countdown, setCountdown] = useState(0);
+  const [adminEmail, setAdminEmail] = useState('');
   const router = useRouter();
 
   // Check for existing token and redirect to dashboard if found
@@ -35,8 +36,8 @@ const Login = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          email: 'rohithbn27@gmail.com', // Always send to this email
-          username, 
+          email: adminEmail, // Use consistent email
+          username,
           password 
         }),
       });
@@ -76,7 +77,7 @@ const Login = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          email: 'rohithbn27@gmail.com', 
+          email: adminEmail, // Use consistent email
           otp 
         }),
       });
@@ -105,7 +106,7 @@ const Login = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          email: 'rohithbn27@gmail.com',
+          email: adminEmail, // Use consistent email
           username,
           password
         }),
@@ -157,6 +158,14 @@ const Login = () => {
               required
             />
             <input
+              type="email"
+              placeholder="Admin Email"
+              value={adminEmail}
+              onChange={e => setAdminEmail(e.target.value)}
+              className="p-3 border border-white rounded bg-[#111] text-white focus:outline-none focus:ring-2 focus:ring-white"
+              required
+            />
+            <input
               type="password"
               placeholder="Password"
               value={password}
@@ -175,7 +184,7 @@ const Login = () => {
               {loading ? 'Sending OTP...' : 'Continue with OTP'}
             </button>
             <p className="text-xs text-gray-400 text-center mt-2">
-              An OTP will be sent to the admin email address
+              An OTP will be sent to the entered email address
             </p>
           </form>
         ) : (
@@ -185,7 +194,7 @@ const Login = () => {
           >
             <h2 className="text-center mb-4 tracking-wider text-2xl font-bold">Enter OTP</h2>
             <p className="text-sm text-gray-400 text-center mb-4">
-              We've sent a one-time password to <strong>rohithbn27@gmail.com</strong>
+              We've sent a one-time password to <strong>{adminEmail}</strong>
             </p>
             
             <input

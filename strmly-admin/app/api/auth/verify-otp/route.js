@@ -45,6 +45,11 @@ export async function POST(request) {
       const backendUrl = `${process.env.NEXT_PUBLIC_STRMLY_BACKEND_URL}/login`;
       console.log(`Attempting to login with backend at: ${backendUrl}`);
       
+      // Check if we're in development and backend is localhost
+      if (process.env.NODE_ENV === 'development' && backendUrl.includes('localhost')) {
+        console.warn('Development mode: Backend is localhost, may not be available in production');
+      }
+      
       const backendResponse = await fetch(backendUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -74,6 +79,16 @@ export async function POST(request) {
       }
     } catch (backendError) {
       console.error('Backend login error:', backendError);
+      
+      // Check if it's a connection error to localhost
+      if (backendError.cause?.code === 'ECONNREFUSED' && backendError.cause?.address === '127.0.0.1') {
+        console.error('Connection refused to localhost - backend URL needs to be updated for production');
+        return Response.json({
+          success: false,
+          message: "Backend service is not available. Please check your configuration."
+        }, { status: 503 });
+      }
+      
       return Response.json({
         success: false,
         message: "Failed to authenticate with backend"
