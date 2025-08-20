@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 const Login = () => {
@@ -10,7 +10,20 @@ const Login = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [countdown, setCountdown] = useState(0);
+  const [adminEmail, setAdminEmail] = useState('');
   const router = useRouter();
+
+  // Check for existing token and redirect to dashboard if found
+  useEffect(() => {
+    try {
+      const token = localStorage.getItem('token');
+      if (token) {
+        router.push('/dashboard');
+      }
+    } catch (err) {
+      console.error("Error checking authentication:", err);
+    }
+  }, [router]);
 
   const handleCredentialsSubmit = async (e) => {
     e.preventDefault();
@@ -23,8 +36,8 @@ const Login = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          email: 'rohithbn27@gmail.com', // Always send to this email
-          username, 
+          email: adminEmail, // Use consistent email
+          username,
           password 
         }),
       });
@@ -64,7 +77,7 @@ const Login = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          email: 'rohithbn27@gmail.com', 
+          email: adminEmail, // Use consistent email
           otp 
         }),
       });
@@ -93,7 +106,7 @@ const Login = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          email: 'rohithbn27@gmail.com',
+          email: adminEmail, // Use consistent email
           username,
           password
         }),
@@ -135,12 +148,20 @@ const Login = () => {
             onSubmit={handleCredentialsSubmit}
             className="bg-black mt-44 text-white p-8 rounded-lg shadow-lg min-w-[320px] flex flex-col gap-4"
           >
-            <h2 className="text-center mb-4 tracking-widest text-2xl font-bold">STRMLY Admin Login</h2>
+            <h2 className="text-center mb-4 tracking-wider text-2xl font-bold">STRMLY Admin Login</h2>
             <input
               type="text"
               placeholder="Username"
               value={username}
               onChange={e => setUsername(e.target.value)}
+              className="p-3 border border-white rounded bg-[#111] text-white focus:outline-none focus:ring-2 focus:ring-white"
+              required
+            />
+            <input
+              type="email"
+              placeholder="Admin Email"
+              value={adminEmail}
+              onChange={e => setAdminEmail(e.target.value)}
               className="p-3 border border-white rounded bg-[#111] text-white focus:outline-none focus:ring-2 focus:ring-white"
               required
             />
@@ -163,7 +184,7 @@ const Login = () => {
               {loading ? 'Sending OTP...' : 'Continue with OTP'}
             </button>
             <p className="text-xs text-gray-400 text-center mt-2">
-              An OTP will be sent to the admin email address
+              An OTP will be sent to the entered email address
             </p>
           </form>
         ) : (
@@ -171,9 +192,9 @@ const Login = () => {
             onSubmit={handleOtpSubmit}
             className="bg-black mt-44 text-white p-8 rounded-lg shadow-lg min-w-[320px] flex flex-col gap-4"
           >
-            <h2 className="text-center mb-4 tracking-widest text-2xl font-bold">Enter OTP</h2>
+            <h2 className="text-center mb-4 tracking-wider text-2xl font-bold">Enter OTP</h2>
             <p className="text-sm text-gray-400 text-center mb-4">
-              We've sent a one-time password to <strong>rohithbn27@gmail.com</strong>
+              We've sent a one-time password to <strong>{adminEmail}</strong>
             </p>
             
             <input

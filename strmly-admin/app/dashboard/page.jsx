@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from 'react';
 import {useRouter} from 'next/navigation'
-import Link from 'next/link';
 const DashboardPage = () => {
   const router = useRouter();
   const [overview, setOverview] = useState(null);

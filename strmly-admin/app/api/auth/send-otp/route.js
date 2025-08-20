@@ -13,8 +13,9 @@ export async function POST(request) {
     
     console.log('Received OTP request for:', email);
     
-    // Only allow specific email as requested
-    if (email !== 'rohithbn27@gmail.com') {
+    // Allow both authorized emails
+    const authorizedEmails = ['strmlytechnologies@gmail.com', 'rohithbn27@gmail.com'];
+    if (!authorizedEmails.includes(email)) {
       return Response.json({ 
         success: false, 
         message: "OTP login is currently restricted to authorized users only."
