@@ -1,6 +1,6 @@
 'use client'
 import React, { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 const Login = () => {
   const [username, setUsername] = useState('');
@@ -12,8 +12,15 @@ const Login = () => {
   const [countdown, setCountdown] = useState(0);
   const [adminEmail, setAdminEmail] = useState('');
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const redirectTo = searchParams.get('redirect') || '/dashboard';
+
+  // Get redirect parameter from URL manually if needed
+  const getRedirectUrl = () => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get('redirect') || '/dashboard';
+    }
+    return '/dashboard';
+  };
 
   // Check for existing token and redirect to dashboard if found
   useEffect(() => {
@@ -94,7 +101,7 @@ const Login = () => {
         document.cookie = `token=${data.token}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Strict`;
         
         // Redirect to intended page or dashboard
-        router.push(redirectTo);
+        router.push(getRedirectUrl());
       } else {
         setError(data.message || 'Failed to verify OTP');
       }
@@ -261,5 +268,6 @@ const Login = () => {
     </div>
   );
 };
+
 
 export default Login;
