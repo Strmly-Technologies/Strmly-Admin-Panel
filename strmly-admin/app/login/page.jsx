@@ -13,6 +13,7 @@ const Login = () => {
   const [adminEmail, setAdminEmail] = useState('');
   const router = useRouter();
 
+
   // Get redirect parameter from URL manually if needed
   const getRedirectUrl = () => {
     if (typeof window !== 'undefined') {
@@ -21,7 +22,6 @@ const Login = () => {
     }
     return '/dashboard';
   };
-
   // Check for existing token and redirect to dashboard if found
   useEffect(() => {
     try {
