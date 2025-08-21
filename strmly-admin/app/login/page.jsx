@@ -1,6 +1,6 @@
 'use client'
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 const Login = () => {
   const [username, setUsername] = useState('');
@@ -12,6 +12,8 @@ const Login = () => {
   const [countdown, setCountdown] = useState(0);
   const [adminEmail, setAdminEmail] = useState('');
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get('redirect') || '/dashboard';
 
   // Check for existing token and redirect to dashboard if found
   useEffect(() => {
@@ -77,7 +79,7 @@ const Login = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          email: adminEmail, // Use consistent email
+          email: adminEmail,
           otp 
         }),
       });
@@ -85,8 +87,14 @@ const Login = () => {
       const data = await response.json();
       
       if (data.success && data.token) {
+        // Store token in localStorage
         localStorage.setItem('token', data.token);
-        router.push('/dashboard');
+        
+        // Set token in cookie for middleware
+        document.cookie = `token=${data.token}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Strict`;
+        
+        // Redirect to intended page or dashboard
+        router.push(redirectTo);
       } else {
         setError(data.message || 'Failed to verify OTP');
       }
