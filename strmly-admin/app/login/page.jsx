@@ -94,14 +94,20 @@ const Login = () => {
       const data = await response.json();
       
       if (data.success && data.token) {
+        console.log('OTP verified, setting token and redirecting...');
+        
         // Store token in localStorage
         localStorage.setItem('token', data.token);
         
         // Set token in cookie for middleware
         document.cookie = `token=${data.token}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Strict`;
         
-        // Redirect to intended page or dashboard
-        router.push(getRedirectUrl());
+        console.log('Token set, redirecting to:', getRedirectUrl());
+        
+        // Small delay to ensure cookie is set
+        setTimeout(() => {
+          router.push(getRedirectUrl());
+        }, 100);
       } else {
         setError(data.message || 'Failed to verify OTP');
       }
