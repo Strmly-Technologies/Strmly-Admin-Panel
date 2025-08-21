@@ -13,6 +13,15 @@ const Login = () => {
   const [adminEmail, setAdminEmail] = useState('');
   const router = useRouter();
 
+
+  // Get redirect parameter from URL manually if needed
+  const getRedirectUrl = () => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get('redirect') || '/dashboard';
+    }
+    return '/dashboard';
+  };
   // Check for existing token and redirect to dashboard if found
   useEffect(() => {
     try {
@@ -77,7 +86,7 @@ const Login = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          email: adminEmail, // Use consistent email
+          email: adminEmail,
           otp 
         }),
       });
@@ -85,8 +94,14 @@ const Login = () => {
       const data = await response.json();
       
       if (data.success && data.token) {
+        // Store token in localStorage
         localStorage.setItem('token', data.token);
-        router.push('/dashboard');
+        
+        // Set token in cookie for middleware
+        document.cookie = `token=${data.token}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Strict`;
+        
+        // Redirect to intended page or dashboard
+        router.push(getRedirectUrl());
       } else {
         setError(data.message || 'Failed to verify OTP');
       }
@@ -253,5 +268,6 @@ const Login = () => {
     </div>
   );
 };
+
 
 export default Login;
