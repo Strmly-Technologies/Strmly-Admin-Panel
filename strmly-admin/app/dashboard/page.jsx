@@ -2,18 +2,12 @@
 
 import React, { useEffect, useState } from 'react';
 import {useRouter} from 'next/navigation'
+
 const DashboardPage = () => {
   const router = useRouter();
   const [overview, setOverview] = useState(null);
   const [ovLoading, setOvLoading] = useState(false);
   const [ovError, setOvError] = useState('');
-
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      router.push('/login');
-    }
-  }, []);
 
   useEffect(() => {
     const fetchOverview = async () => {
@@ -215,3 +209,4 @@ const MetricCard = ({ label, value }) => (
 
 
 export default DashboardPage;
+  

@@ -14,7 +14,12 @@ const page = () => {
 
   const router = useRouter();
   const handleLogout = () => {
+    // Clear localStorage
     localStorage.removeItem('token');
+    
+    // Clear cookie
+    document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    
     router.push('/login');
   }
 
