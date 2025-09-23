@@ -16,6 +16,51 @@ export const page = () => {
     const [filterMode, setFilterMode] = useState('all'); // 'all' or 'date'
     const router = useRouter();
 
+    // per-user add-money state
+    const [addAmounts, setAddAmounts] = useState({}) // { userId: '100' }
+    const [addLoading, setAddLoading] = useState({})   // { userId: true/false }
+    const [addMsg, setAddMsg] = useState({})           // { userId: { type: 'success'|'error', text: '...' } }
+
+    const backend = process.env.NEXT_PUBLIC_STRMLY_BACKEND_URL
+    const authHeaders = () => ({ 
+        'Content-Type': 'application/json', 
+        ...(typeof window !== 'undefined' && localStorage.getItem('token') ? { Authorization: `Bearer ${localStorage.getItem('token')}` } : {}) 
+    })
+
+    const addMoney = async (userId) => {
+        const raw = addAmounts[userId]
+        const amount = Number(raw)
+        if (!amount || amount <= 0) {
+            setAddMsg(prev => ({ ...prev, [userId]: { type: 'error', text: 'Enter a valid amount' } }))
+            return
+        }
+        setAddLoading(prev => ({ ...prev, [userId]: true }))
+        setAddMsg(prev => ({ ...prev, [userId]: null }))
+        try {
+            const res = await fetch(`${backend}/wallet/add/${userId}`, {
+                method: 'POST',
+                headers: authHeaders(),
+                body: JSON.stringify({ amount })
+            })
+            const data = await res.json()
+            if (res.ok && data.success) {
+                const balance = data.wallet?.balance ?? null
+                setAddMsg(prev => ({ ...prev, [userId]: { type: 'success', text: `Added ₹${amount}${balance!==null ? ` — New balance: ₹${balance}` : ''}` } }))
+                // Optionally clear input
+                setAddAmounts(prev => ({ ...prev, [userId]: '' }))
+            } else {
+                setAddMsg(prev => ({ ...prev, [userId]: { type: 'error', text: data.message || 'Failed to add money' } }))
+                if (res.status === 401) {
+                    // unauthorized - redirect to login
+                    router.push('/login')
+                }
+            }
+        } catch (err) {
+            setAddMsg(prev => ({ ...prev, [userId]: { type: 'error', text: 'Network error' } }))
+        }
+        setAddLoading(prev => ({ ...prev, [userId]: false }))
+    }
+
     const handleLogout = () => {
         localStorage.removeItem('token');
         router.push('/login');
@@ -172,7 +217,7 @@ export const page = () => {
                 {loading ? (
                     <div className="text-center py-8">Loading...</div>
                 ) : (
-                    <div className="w-full max-w-6xl overflow-x-auto">
+                    <div className="w-full max-w-7xl overflow-x-auto">
                         <table className="min-w-full border border-black rounded-lg bg-white shadow">
                             <thead>
                                 <tr className="bg-black text-white">
@@ -184,6 +229,7 @@ export const page = () => {
                                     <th className="px-4 py-2 text-left">Videos</th>
                                     <th className="px-4 py-2 text-left">Status</th>
                                     <th className="px-4 py-2 text-left">Email Verified</th>
+                                    <th className='px-4 py-2 text-left'>Add Money</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -211,6 +257,32 @@ export const page = () => {
                                                 ? <span className="bg-black text-white px-2 py-1 rounded">Yes</span>
                                                 : <span className="bg-gray-200 text-black px-2 py-1 rounded">No</span>
                                             }
+                                        </td>
+                                        {/* Add Money cell */}
+                                        <td className="px-4 py-2">
+                                            <div className="flex items-center gap-2" onClick={(e)=>e.stopPropagation()}>
+                                                <input
+                                                    type="number"
+                                                    min="1"
+                                                    placeholder="Amount"
+                                                    value={addAmounts[user._id] ?? ''}
+                                                    onChange={e => setAddAmounts(prev => ({ ...prev, [user._id]: e.target.value }))}
+                                                    className="w-28 p-2 border border-black rounded bg-white text-black focus:outline-none"
+                                                    onClick={(e)=>e.stopPropagation()}
+                                                />
+                                                <button
+                                                    onClick={(e) => { e.stopPropagation(); addMoney(user._id) }}
+                                                    disabled={!!addLoading[user._id]}
+                                                    className="px-3 py-2 border border-black rounded bg-black text-white hover:bg-gray-800 disabled:opacity-50"
+                                                >
+                                                    {addLoading[user._id] ? 'Adding...' : 'Add'}
+                                                </button>
+                                            </div>
+                                            {addMsg[user._id] && (
+                                                <div className={`text-sm mt-1 ${addMsg[user._id].type === 'success' ? 'text-green-600' : 'text-red-600'}`}>
+                                                    {addMsg[user._id].text}
+                                                </div>
+                                            )}
                                         </td>
                                     </tr>
                                 ))}
