@@ -1,6 +1,7 @@
 'use client'
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { getAuthHeaders, logout } from '../../utils/authUtils';
 
 const page = () => {
     const [display, setDisplay] = useState('wallet-load');
@@ -13,10 +14,7 @@ const page = () => {
     const displayOptions = ['wallet-load','creator-pass','comment-gifting'];
     const router = useRouter();
 
-    const authHeaders = () => ({
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-    });
+    const authHeaders = getAuthHeaders;
 
     const fetchWalletLoad = async () => {
         setError('');
@@ -97,13 +95,7 @@ const page = () => {
     }, [display]);
 
     const handleLogout = () => {
-        // Clear localStorage
-        localStorage.removeItem('token');
-        
-        // Clear cookie
-        document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-        
-        router.push('/login');
+        logout(router);
     };
 
     const isWallet = display === 'wallet-load';

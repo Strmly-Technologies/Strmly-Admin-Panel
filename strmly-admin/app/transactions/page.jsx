@@ -1,6 +1,7 @@
 'use client'
 import React, { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { logout } from '../../utils/authUtils';
 
 const page = () => {
   const [transactions, setTransactions] = useState([]);
@@ -14,13 +15,7 @@ const page = () => {
 
   const router = useRouter();
   const handleLogout = () => {
-    // Clear localStorage
-    localStorage.removeItem('token');
-    
-    // Clear cookie
-    document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-    
-    router.push('/login');
+    logout(router);
   }
 
   // Initial fetch (no query params; all filtering is client-side)

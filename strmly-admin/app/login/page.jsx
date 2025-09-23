@@ -99,16 +99,12 @@ const Login = () => {
         // Store token in localStorage
         localStorage.setItem('token', data.token);
         
-        // Set token in cookie for middleware
-        document.cookie = `token=${data.token}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Strict`;
+        // Get the redirect URL
+        const redirectUrl = getRedirectUrl();
+        console.log('Token set, redirecting to:', redirectUrl);
         
-        console.log('Token set, redirecting to:', getRedirectUrl());
-        router.push('/dashboard');
-        
-        // Small delay to ensure cookie is set
-        // setTimeout(() => {
-        //   router.push(getRedirectUrl());
-        // }, 100);
+        // Use replace instead of push to avoid browser history issues
+        router.replace(redirectUrl);
       } else {
         setError(data.message || 'Failed to verify OTP');
       }

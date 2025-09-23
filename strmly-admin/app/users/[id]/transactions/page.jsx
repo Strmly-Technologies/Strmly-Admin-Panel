@@ -1,6 +1,7 @@
 'use client'
 import React, { useEffect, useMemo, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
+import { getAuthHeaders, logout } from '../../../../utils/authUtils';
 
 const UserTransactionsPage = () => {
   const { id } = useParams()
@@ -18,11 +19,8 @@ const UserTransactionsPage = () => {
 
   const backend = process.env.NEXT_PUBLIC_STRMLY_BACKEND_URL
 
-  const authHeaders = () => {
-    if (typeof window === 'undefined') return { 'Content-Type': 'application/json' }
-    const token = localStorage.getItem('token')
-    return { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) }
-  }
+  // Replace the authHeaders function
+  const authHeaders = getAuthHeaders;
 
   useEffect(() => {
     if (!id) return
@@ -83,8 +81,7 @@ const UserTransactionsPage = () => {
   )
 
   const handleLogout = () => {
-    if (typeof window !== 'undefined') localStorage.removeItem('token')
-    router.push('/login')
+    logout(router);
   }
 
   return (

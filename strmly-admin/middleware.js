@@ -21,27 +21,22 @@ export function middleware(request) {
     return NextResponse.next()
   }
 
-  // Check for authentication token in cookies
-  const token = request.cookies.get('token')?.value || 
-                request.headers.get('authorization')?.replace('Bearer ', '')
-
-  // For client-side routes, we need to check localStorage token differently
-  // Since we can't access localStorage in middleware, we'll rely on a cookie or header
+  // Check for authentication token in request headers
+  const token = request.headers.get('authorization')?.replace('Bearer ', '')
   
-  // If no token is found, redirect to login
-  if (!token) {
-    // Create the login URL
-    const loginUrl = new URL('/login', request.url)
-    
-    // Optionally add a redirect parameter to send user back after login
-    if (pathname !== '/') {
-      loginUrl.searchParams.set('redirect', pathname)
+  // For API routes, check the Authorization header
+  if (pathname.startsWith('/api/')) {
+    if (!token) {
+      return new NextResponse(
+        JSON.stringify({ success: false, message: 'Authentication required' }),
+        { status: 401, headers: { 'Content-Type': 'application/json' } }
+      )
     }
-    
-    return NextResponse.redirect(loginUrl)
+    return NextResponse.next()
   }
-
-  // If token exists, allow the request to continue
+  
+  // For page routes, we'll let the client handle authentication
+  // This prevents redirect loops when localStorage has a token but headers don't
   return NextResponse.next()
 }
 
@@ -51,7 +46,6 @@ export const config = {
   matcher: [
     /*
      * Match all request paths except for the ones starting with:
-     * - api (API routes)
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
@@ -60,3 +54,4 @@ export const config = {
     '/((?!_next/static|_next/image|favicon.ico).*)',
   ],
 }
+    
