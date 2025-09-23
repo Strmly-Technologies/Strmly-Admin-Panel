@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { getAuthHeaders, logout } from '../../utils/authUtils';
 
 export const page = () => {
     const [users, setUsers] = useState([]);
@@ -62,8 +63,7 @@ export const page = () => {
     }
 
     const handleLogout = () => {
-        localStorage.removeItem('token');
-        router.push('/login');
+        logout(router);
     }
 
     // Fetch stats
@@ -74,10 +74,7 @@ export const page = () => {
                     `${process.env.NEXT_PUBLIC_STRMLY_BACKEND_URL}/stats`,
                     {
                         method: 'GET',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${localStorage.getItem('token')}`
-                        }
+                        headers: getAuthHeaders()
                     }
                 );
                 if (!response.ok) return;

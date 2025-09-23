@@ -1,7 +1,8 @@
 'use client'
 
 import React, { useEffect, useState } from 'react';
-import {useRouter} from 'next/navigation'
+import { useRouter } from 'next/navigation';
+import { getAuthHeaders, isAuthenticated, logout, redirectToLoginIfNeeded } from '../../utils/authUtils';
 
 const DashboardPage = () => {
   const router = useRouter();
@@ -10,15 +11,17 @@ const DashboardPage = () => {
   const [ovError, setOvError] = useState('');
 
   useEffect(() => {
+    // Check authentication on component mount
+    if (redirectToLoginIfNeeded(router)) {
+      return; // Return early if redirected
+    }
+    
     const fetchOverview = async () => {
       setOvLoading(true);
       setOvError('');
       try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_STRMLY_BACKEND_URL}/financial-overview`, {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
+          headers: getAuthHeaders()
         });
         if (!res.ok) {
           setOvError('Failed to load financial overview');
@@ -36,16 +39,10 @@ const DashboardPage = () => {
       setOvLoading(false);
     };
     fetchOverview();
-  }, []);
+  }, [router]);
 
   const handleLogout = () => {
-    // Clear localStorage
-    localStorage.removeItem('token');
-    
-    // Clear cookie
-    document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-    
-    router.push('/login');
+    logout(router);
   }
 
   return (
@@ -209,4 +206,4 @@ const MetricCard = ({ label, value }) => (
 
 
 export default DashboardPage;
-  
+   

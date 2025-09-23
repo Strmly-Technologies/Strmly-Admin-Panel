@@ -1,6 +1,7 @@
 'use client'
 import React, { useEffect, useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
+import { logout } from '../../utils/authUtils';
 
 const WithdrawalsPage = () => {
   const router = useRouter()
@@ -109,8 +110,7 @@ const WithdrawalsPage = () => {
   }
 
   const handleLogout = () => {
-    if (typeof window !== 'undefined') localStorage.removeItem('token')
-    router.push('/login')
+    logout(router);
   }
 
   return (
