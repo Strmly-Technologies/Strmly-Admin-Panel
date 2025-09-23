@@ -103,11 +103,12 @@ const Login = () => {
         document.cookie = `token=${data.token}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Strict`;
         
         console.log('Token set, redirecting to:', getRedirectUrl());
+        router.push('/dashboard');
         
         // Small delay to ensure cookie is set
-        setTimeout(() => {
-          router.push(getRedirectUrl());
-        }, 100);
+        // setTimeout(() => {
+        //   router.push(getRedirectUrl());
+        // }, 100);
       } else {
         setError(data.message || 'Failed to verify OTP');
       }
