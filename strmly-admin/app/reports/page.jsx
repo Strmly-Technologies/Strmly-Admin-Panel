@@ -28,6 +28,33 @@ export default function ReportsPage() {
     logout(router);
   };
 
+  // Add this new function after handleDeleteVideo
+const handleDeleteUser = async (userId,reporterId) => {
+  if (!userId) return;
+  
+  if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+    return;
+  }
+
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_STRMLY_BACKEND_URL}/user/${userId}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ reporterId: reporterId })
+    });
+
+    if (res.ok) {
+      // Refresh the reports list after successful deletion
+      fetchReports();
+    } else {
+      throw new Error('Failed to delete user');
+    }
+  } catch (error) {
+    console.error('Error deleting user:', error);
+    alert('Failed to delete user. Please try again.');
+  }
+};
+
   const fetchReports = async () => {
     if (isLoading) return;
     
@@ -72,6 +99,32 @@ export default function ReportsPage() {
   useEffect(() => {
     fetchReports();
   }, [page, statusFilter, contentTypeFilter, reasonFilter]);
+
+  const handleDeleteVideo = async (videoId,reporterId) => {
+  if (!videoId) return;
+  
+  if (!confirm('Are you sure you want to delete this video? This action cannot be undone.')) {
+    return;
+  }
+
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_STRMLY_BACKEND_URL}/video/${videoId}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+      body:JSON.stringify({reporterId:reporterId})
+    });
+
+    if (res.ok) {
+      // Refresh the reports list after successful deletion
+      fetchReports();
+    } else {
+      throw new Error('Failed to delete video');
+    }
+  } catch (error) {
+    console.error('Error deleting video:', error);
+    alert('Failed to delete video. Please try again.');
+  }
+};
 
   const handleUpdateStatus = async (reportId, newStatus) => {
     setActionLoading(prev => ({ ...prev, [reportId]: newStatus }));
@@ -177,20 +230,28 @@ export default function ReportsPage() {
               {/* Content details based on type */}
               {report.content_details ? (
                 <div className="mt-2 p-3 border border-gray-300 rounded">
-                  // Inside your ReportItem component, update the video rendering section:
+
 
 {report.content_type === 'video' && (
   <>
     {report.content_details.videoUrl ? (
-      <video
-        width="100%"
-        controls
-        style={{ height: 'auto' }}
-        src={report.content_details.videoUrl}
-        preload="metadata"
-      >
-        Your browser does not support the video tag.
-      </video>
+      <div className="relative">
+        <video
+          width="100%"
+          controls
+          style={{ height: 'auto' }}
+          src={report.content_details.videoUrl}
+          preload="metadata"
+        >
+          Your browser does not support the video tag.
+        </video>
+        <button
+          onClick={() => handleDeleteVideo(report.content_details._id,report.reporter_id)}
+          className="absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-full text-sm font-medium shadow-lg transition-colors"
+        >
+          Delete Video
+        </button>
+      </div>
     ) : (
       <div className="w-full h-40 flex items-center justify-center bg-gray-100 rounded">
         <span className="text-gray-500">Video not available</span>
@@ -237,10 +298,9 @@ export default function ReportsPage() {
                     </>
                   )}
                   
-                  {report.content_type === 'user' && (
+                 {report.content_type === 'user' && (
                     <>
-                      <div className="flex items-center">
-                        
+                      <div className="flex items-center justify-between">
                         <div>
                           <p className="font-medium">{report.content_details.username}</p>
                           <p className="text-xs text-gray-600">{report.content_details.email}</p>
@@ -251,6 +311,12 @@ export default function ReportsPage() {
                             {report.content_details.account_status?.is_deactivated ? 'Deactivated' : 'Active'}
                           </p>
                         </div>
+                        <button
+                          onClick={() => handleDeleteUser(report.content_details._id,report.reporter_id)}
+                          className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-full text-sm font-medium shadow-lg transition-colors"
+                        >
+                          Delete User
+                        </button>
                       </div>
                     </>
                   )}
