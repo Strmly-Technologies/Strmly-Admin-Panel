@@ -3,7 +3,8 @@ const nextConfig = {
   images: {
     domains: [
       'strmly-videos-dev-mumbai-2.s3.ap-south-1.amazonaws.com',
-      'strmly-videos-dev-mumbai-2.s3.amazonaws.com'
+      'strmly-videos-dev-mumbai-2.s3.amazonaws.com',
+      'strmly-videos-dev-mumbai.s3.ap-south-1.amazonaws.com'
     ],
   },
   // Remove the COEP/COOP headers or make them less restrictive
